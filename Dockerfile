@@ -1,4 +1,4 @@
-FROM ghcr.io/astral-sh/uv:python3.11-alpine
+FROM ghcr.io/astral-sh/uv:debian-slim
 
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
