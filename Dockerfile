@@ -4,7 +4,7 @@ RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
 
-COPY ./requirements.txt /requirements.txt
+COPY ./uv.lock /uv.lock
 
 RUN uv sync --frozen
 
