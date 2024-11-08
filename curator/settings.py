@@ -80,7 +80,7 @@ WSGI_APPLICATION = 'curator.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': BASE_DIR / 'persistent/db.sqlite3' if os.environ.get('CAPROVER') else BASE_DIR / 'db.sqlite3',
     }
 }
 
