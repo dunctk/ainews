@@ -1,0 +1,67 @@
+
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8">Latest AI News</h1>
+    
+    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {% for story in stories %}
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                
+                <div class="p-4">
+                    
+                    <h2 class="text-xl font-semibold mb-2">
+                        <a href="{{ story.link }}" target="_blank" class="hover:text-blue-600">
+                            {{ story.title }}
+                        </a>
+                    </h2>
+
+                    <div class="flex items-center mb-2">
+                        {% if story.source.icon %}
+                            <img src="{{ story.source.icon }}" width="20px" height="20px" alt="{{ story.source.name }}" class="w-6 h-6 mr-2">
+                        {% endif %}
+                        <span class="text-sm text-gray-600">{{ story.source.name }}</span>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-2 mb-3">
+                        {% for category in story.categories.all %}
+                            <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                                {{ category.name }}
+                            </span>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="text-sm text-gray-600">
+                        {{ story.pubDate|date:"F j, Y, g:i a" }}
+                    </div>
+
+                    <div class="text-sm text-gray-600">
+                        {{ story.relevance_score }}% relevant ({{ story.relevance_reason }})
+                    </div>
+
+                    <div class="text-sm text-gray-600">
+                        {{ story.description }}
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <p class="col-span-full text-center text-gray-500">No stories found.</p>
+        {% endfor %}
+    </div>
+
+    {% if is_paginated %}
+        <div class="mt-8 flex justify-center gap-2">
+            {% if page_obj.has_previous %}
+                <a href="?page=1" class="px-3 py-1 bg-gray-200 rounded">&laquo; First</a>
+                <a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-1 bg-gray-200 rounded">Previous</a>
+            {% endif %}
+
+            <span class="px-3 py-1">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-1 bg-gray-200 rounded">Next</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}" class="px-3 py-1 bg-gray-200 rounded">Last &raquo;</a>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
