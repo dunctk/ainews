@@ -278,15 +278,17 @@ def find_relevant_page_for_story(story: Story):
     result = response.choices[0].message.content
     try:
         data = json.loads(result)
-        sitemap_url = SitemapURL.objects.get(id=data['url_id'])
+        try:
+            sitemap_url = SitemapURL.objects.get(id=data['url_id'])
+            create_post(story, sitemap_url)
+            print(f"Found relevant page: {sitemap_url.url} - {data['reason']}")
+        except SitemapURL.DoesNotExist:
+            logger.error(f"URL with ID {data['url_id']} not found in database")
+            return
     except json.JSONDecodeError:
-        print('error:', result)
-        return 
-    
-    create_post(story, sitemap_url)
+        logger.error(f'Error decoding JSON response: {result}')
+        return
 
-    print(f"Found relevant page: {sitemap_url.url} - {data['reason']}")
-    
 
 def generate_post_content(story: Story, sitemap_url: SitemapURL):
 
