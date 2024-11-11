@@ -298,6 +298,8 @@ def generate_post_content(story: Story, sitemap_url: SitemapURL):
     with a straightforward connection between the news story and the page content.
     When referencing the news article, don't say 'the article', just say 'this'.
     Add a learn more link at the end of the post, linking to the page on our website.
+    This will be shared on LinkedIn, so add the plain anchor text of the link as the link text,
+    for example 'Learn more: https://www.clickworker.com/...'
     Do not use the words 'evolving', 'transforming', 'disrupting' or 'revolutionizing'.
     """
 
