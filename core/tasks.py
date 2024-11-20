@@ -193,6 +193,9 @@ def sync_sitemap():
     SITEMAP_URL = "https://www.clickworker.com/sitemap_index.xml/"
     print(f"Syncing sitemap from {SITEMAP_URL}")
     
+    import ssl
+    ssl._create_default_https_context = ssl._create_unverified_context
+    
     # Get sitemap data into DataFrame
     sitemap_df = advertools.sitemap_to_df(SITEMAP_URL)
     
@@ -248,6 +251,12 @@ def sync_sitemap():
 
 
 def find_relevant_page_for_story(story: Story):
+    # Check if we have any URLs in the database
+    url_count = SitemapURL.objects.count()
+    if url_count == 0:
+        logger.error("No URLs found in database. Please run sync_sitemap first.")
+        return
+
     # Get all URLs and their metadata
     urls = SitemapURL.objects.all().values('id', 'title', 'meta_desc')
     
