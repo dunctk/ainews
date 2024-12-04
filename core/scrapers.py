@@ -7,6 +7,8 @@ from logging import getLogger
 import os
 from pyairtable import Api
 from typing import Dict, Any
+import base64
+from django.core.files.storage import default_storage
 
 logger = getLogger(__name__)
 
@@ -95,61 +97,12 @@ def print_airtable_schema():
     else:
         print("No records found in Airtable")
 
-def sync_airtable_remixables():
-    AIRTABLE_API_KEY = os.getenv('AIRTABLE_API_KEY')
-    BASE_ID = 'app1qC1c10uiW1DRr'
-    TABLE_ID = 'tbllQR6GmaJD579oS'
-    
-    api = Api(AIRTABLE_API_KEY)
-    table = api.table(BASE_ID, TABLE_ID)
-    
-    records = table.all()
-    logger.info(f"Found {len(records)} records in Airtable")
-    
-    for record in records:
-        fields = record['fields']
-        video_url = fields.get('video_url')
-        remixed_as = fields.get('post')  # The 'post' field contains the remixed content
-        
-        if not video_url:
-            continue
-            
-        try:
-            remixable, created = Remixable.objects.get_or_create(
-                url=video_url,
-                defaults={
-                    'remixed_as': remixed_as,
-                    'title': fields.get('video_title'),
-                    'is_video': True,  # These are all videos
-                    'markdown_content': fields.get('transcript')  # Store transcript in markdown_content
-                }
-            )
-            
-            if not created:
-                # Update fields if they've changed
-                remixable.remixed_as = remixed_as
-                remixable.title = fields.get('video_title')
-                remixable.markdown_content = fields.get('transcript')
-                remixable.save()
-                
-            # Handle images if present
-            images = fields.get('image', [])
-            if images:
-                for image_url in images:
-                    RemixableImage.objects.get_or_create(
-                        remixable=remixable,
-                        image_url=image_url
-                    )
-                
-            logger.info(f"{'Created' if created else 'Updated'} remixable: {video_url}")
-            
-        except Exception as e:
-            logger.error(f"Error processing record {video_url}: {str(e)}")
 
 def sync_remixables_to_airtable():
     AIRTABLE_API_KEY = os.getenv('AIRTABLE_API_KEY')
     BASE_ID = 'app1qC1c10uiW1DRr'
     TABLE_ID = 'tbllQR6GmaJD579oS'
+    BASE_URL = os.getenv('BASE_URL', 'http://localhost:8000')
     
     api = Api(AIRTABLE_API_KEY)
     table = api.table(BASE_ID, TABLE_ID)
@@ -167,6 +120,11 @@ def sync_remixables_to_airtable():
                 'post': remixable.remixed_as,
                 'transcript': remixable.markdown_content
             }
+            
+            # Add image URL if available
+            if remixable.remixed_image:
+                image_url = f"{BASE_URL}{remixable.remixed_image.url}"
+                fields['image'] = [{'url': image_url}]
             
             # Try to find existing record by video_url
             existing_records = table.all(formula=f"{{video_url}}='{remixable.url}'")

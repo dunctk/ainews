@@ -129,3 +129,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 STATIC_ROOT = BASE_DIR / 'static'
+
+# Media files configuration
+MEDIA_URL = '/media/'
+MEDIA_ROOT = Path('/persistent/media') if os.environ.get('CAPROVER') else BASE_DIR / 'media'
+
+# Production URL for media files
+BASE_URL = os.getenv('BASE_URL', 'http://localhost:8000')

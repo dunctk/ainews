@@ -10,6 +10,8 @@ from django.utils.dateparse import parse_datetime
 import advertools
 from .models import Post, Source, Keyword, Country, Category, Story, SitemapURL, Remixable
 import anthropic
+import replicate
+from django.core.files.base import ContentFile
 
 logger = logging.getLogger(__name__)
 load_dotenv()
@@ -435,6 +437,37 @@ def generate_post_for_remixable(post_markdown: str, source_name: str) -> str:
     return message.content[0].text
 
 
+def generate_image_for_post(post: Post):
+    prompt = f"""
+    Generate a 2-4 word text to go on a poster image for the following post:
+    '{post.remixed_as[:2000]}...'
+    Only output the text, nothing else, no preamble, no postscript.
+    """
+    response = anthropic_client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=50,
+        system="You are a creative assistant that generates short, catchy text for posters.",
+        messages=[
+            {"role": "user", "content": prompt}
+        ]
+    )
+    poster_text = response.content[0].text.strip()
+    output = replicate.run(
+        "ideogram-ai/ideogram-v2",
+        input={
+            "prompt": f"A Retro Futurism sci-fi style typographic poster with the text '{poster_text}', against a vintage sci-fi background.",
+            "resolution": "None",
+            "style_type": "Auto",
+            "aspect_ratio": "1:1",
+            "magic_prompt_option": "Auto"
+        }
+    )
+    print(output)
+
+    post.remixed_image.save(f"{post.id}.png", ContentFile(output.read()))
+    post.save()
+
+
 def url_to_source_name(url: str) -> str:
     """Convert URL to a clean source name (just the capitalized domain without www or TLD).
     For subdomains other than www, use the root domain (e.g., blog.duolingo.com -> Duolingo)."""
@@ -470,5 +503,7 @@ def generate_posts_for_all_remixables():
             print(f"Generated post for {remixable.url}\n{post}\n\n")
             remixable.remixed_as = post
             remixable.save()
+            generate_image_for_post(remixable)
         else:
             print(f"No post generated for {remixable.url}")
+

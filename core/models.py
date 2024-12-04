@@ -94,6 +94,7 @@ class Remixable(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     remixed_as = models.TextField(blank=True, null=True)
+    remixed_image = models.FileField(upload_to='remixed_images/', null=True, blank=True)
 
     def __str__(self):
         return self.title or self.url

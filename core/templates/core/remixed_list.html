@@ -12,6 +12,9 @@
                         Untitled
                     {% endif %}
                 </h2>
+                {% if item.remixed_image %}
+                    <img src="{{ item.remixed_image.url }}"  class="w-full mb-4">
+                {% endif %}
                 <a href="{{ item.url }}" class="text-blue-600 hover:underline mb-4 block">{{ item.url }}</a>
                 <div class="prose max-w-none">
                     {{ item.remixed_as|linebreaks }}
