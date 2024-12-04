@@ -102,7 +102,7 @@ def sync_remixables_to_airtable():
     AIRTABLE_API_KEY = os.getenv('AIRTABLE_API_KEY')
     BASE_ID = 'app1qC1c10uiW1DRr'
     TABLE_ID = 'tbllQR6GmaJD579oS'
-    BASE_URL = os.getenv('BASE_URL', 'http://localhost:8000')
+    BASE_URL = os.getenv('BASE_URL', 'https://ainews.apps.innermaps.org').rstrip('/')
     
     api = Api(AIRTABLE_API_KEY)
     table = api.table(BASE_ID, TABLE_ID)
@@ -122,8 +122,9 @@ def sync_remixables_to_airtable():
             }
             
             # Add image URL if available
-            if remixable.remixed_image:
-                image_url = f"{BASE_URL}{remixable.remixed_image.url}"
+            if remixable.remixed_image and remixable.remixed_image.name:
+                image_url = f"{BASE_URL}/media/{remixable.remixed_image.name}"
+                logger.info(f"Adding image URL: {image_url}")
                 fields['image'] = [{'url': image_url}]
             
             # Try to find existing record by video_url

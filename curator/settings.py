@@ -135,4 +135,4 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = Path('/persistent/media') if os.environ.get('CAPROVER') else BASE_DIR / 'media'
 
 # Production URL for media files
-BASE_URL = os.getenv('BASE_URL', 'http://localhost:8000')
+BASE_URL = os.getenv('BASE_URL', 'https://ainews.apps.innermaps.org')
