@@ -11,6 +11,12 @@ class Command(BaseCommand):
             action='store_true',
             help='Skip the crawling step and only generate posts',
         )
+        parser.add_argument(
+            '--generate',
+            type=int,
+            default=2,
+            help='Number of posts to generate per remixable (default: 2)',
+        )
 
     def handle(self, *args, **kwargs):
         if not kwargs['skip_crawl']:
@@ -21,5 +27,5 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS('Skipping crawl step...'))
 
         self.stdout.write(self.style.SUCCESS('Starting the generate_posts_for_all_remixables function...'))
-        generate_posts_for_all_remixables()
+        generate_posts_for_all_remixables(limit=kwargs['generate'])
         self.stdout.write(self.style.SUCCESS('Finished running the generate_posts_for_all_remixables function.'))

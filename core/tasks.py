@@ -455,7 +455,7 @@ def generate_image_for_post(post: Post):
     output = replicate.run(
         "ideogram-ai/ideogram-v2",
         input={
-            "prompt": f"A Retro Futurism sci-fi style typographic poster with the text '{poster_text}', against a vintage sci-fi background.",
+            "prompt": f"A vintage sci-fi style typographic poster with the text '{poster_text}', against a vintage sci-fi space background.",
             "resolution": "None",
             "style_type": "Auto",
             "aspect_ratio": "1:1",
@@ -494,9 +494,9 @@ def url_to_source_name(url: str) -> str:
         logger.error(f"Error cleaning source URL {url}: {str(e)}")
         return url
 
-def generate_posts_for_all_remixables():
+def generate_posts_for_all_remixables(limit: int = 2):
     remixables = Remixable.objects.filter(remixed_as__isnull=True, markdown_content__isnull=False)
-    for remixable in remixables[:2]:
+    for remixable in remixables[:limit]:
         source_name = url_to_source_name(remixable.url)
         post = generate_post_for_remixable(remixable.markdown_content, source_name)
         if post:
