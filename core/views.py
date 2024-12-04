@@ -1,8 +1,9 @@
 from django.views.generic import ListView
-from .models import Post, Story
+from .models import Post, Story, Remixable
 from rest_framework import viewsets
 from rest_framework import serializers
 from rest_framework.pagination import PageNumberPagination
+from django.shortcuts import render
 
 # First, create a serializer for your Post model
 class PostSerializer(serializers.ModelSerializer):
@@ -32,5 +33,9 @@ class PostListView(ListView):
     context_object_name = 'posts'
     ordering = ['-created_at']
     paginate_by = 20
+
+def remixed_list(request):
+    remixed = Remixable.objects.exclude(remixed_as__isnull=True)
+    return render(request, 'core/remixed_list.html', {'remixed': remixed})
 
 

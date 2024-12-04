@@ -1,0 +1,24 @@
+
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-6">Remixed Content</h1>
+    
+    <div class="space-y-6">
+        {% for item in remixed %}
+            <div class="bg-white shadow rounded-lg p-6">
+                <h2 class="text-xl font-semibold mb-2">
+                    {% if item.title %}
+                        {{ item.title }}
+                    {% else %}
+                        Untitled
+                    {% endif %}
+                </h2>
+                <a href="{{ item.url }}" class="text-blue-600 hover:underline mb-4 block">{{ item.url }}</a>
+                <div class="prose max-w-none">
+                    {{ item.remixed_as|linebreaks }}
+                </div>
+            </div>
+        {% empty %}
+            <p class="text-gray-600">No remixed content found.</p>
+        {% endfor %}
+    </div>
+</div>

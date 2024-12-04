@@ -82,3 +82,28 @@ class Post(models.Model):
 
     def __str__(self):
         return self.story.title
+    
+
+
+class Remixable(models.Model):
+    url = models.URLField(unique=True)
+    is_video = models.BooleanField(default=False)
+    html_content = models.TextField(blank=True, null=True)
+    markdown_content = models.TextField(blank=True, null=True)
+    title = models.CharField(max_length=500, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    remixed_as = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.title or self.url
+
+
+class RemixableImage(models.Model):
+    remixable = models.ForeignKey(Remixable, on_delete=models.CASCADE)
+    image_url = models.URLField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.image_url
